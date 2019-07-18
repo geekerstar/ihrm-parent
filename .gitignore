@@ -1,0 +1,26 @@
+### Created by Geekerstar(https://github.com/geekerstar)
+
+## Compiled class Files
+*.class
+target/
+
+## Log Files
+*.log
+
+
+## Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+## IDE Files
+*.iml
+.idea
+
+
+## System Files
+.DS_Store
