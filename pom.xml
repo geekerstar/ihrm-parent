@@ -10,6 +10,7 @@
     <modules>
         <module>ihrm-common</module>
         <module>ihrm-common-model</module>
+        <module>ihrm-company</module>
     </modules>
 
     <packaging>pom</packaging>
