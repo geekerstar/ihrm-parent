@@ -6,7 +6,9 @@ import com.geekerstar.common.entity.Result;
 import com.geekerstar.common.entity.ResultCode;
 
 import com.geekerstar.common.utils.JwtUtils;
+import com.geekerstar.common.utils.PermissionConstants;
 import com.geekerstar.domain.system.Permission;
+import com.geekerstar.domain.system.Role;
 import com.geekerstar.domain.system.response.ProfileResult;
 import com.geekerstar.domain.system.User;
 import com.geekerstar.domain.system.response.UserResult;
@@ -107,7 +109,7 @@ public class UserController extends BaseController {
     /**
      * 根据id删除
      */
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE,name = "API-USER-DELETE")
     public Result delete(@PathVariable(value = "id") String id) {
         userService.deleteById(id);
         return new Result(ResultCode.SUCCESS);
@@ -120,21 +122,32 @@ public class UserController extends BaseController {
      * 2.比较password
      * 3.生成jwt信息
      */
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public Result login(@RequestBody Map<String, String> loginMap) {
+    @RequestMapping(value="/login",method = RequestMethod.POST)
+    public Result login(@RequestBody Map<String,String> loginMap) {
         String mobile = loginMap.get("mobile");
         String password = loginMap.get("password");
         User user = userService.findByMobile(mobile);
         //登录失败
-        if (user == null || !user.getPassword().equals(password)) {
+        if(user == null || !user.getPassword().equals(password)) {
             return new Result(ResultCode.MOBILEORPASSWORDERROR);
-        } else {
+        }else {
             //登录成功
-            Map<String, Object> map = new HashMap<>();
-            map.put("companyId", user.getCompanyId());
-            map.put("companyName", user.getCompanyName());
+            //api权限字符串
+            StringBuilder sb = new StringBuilder();
+            //获取到所有的可访问API权限
+            for (Role role : user.getRoles()) {
+                for (Permission perm : role.getPermissions()) {
+                    if(perm.getType() == PermissionConstants.PERMISSION_API) {
+                        sb.append(perm.getCode()).append(",");
+                    }
+                }
+            }
+            Map<String,Object> map = new HashMap<>();
+            map.put("apis",sb.toString());//可访问的api权限字符串
+            map.put("companyId",user.getCompanyId());
+            map.put("companyName",user.getCompanyName());
             String token = jwtUtils.createJwt(user.getId(), user.getUsername(), map);
-            return new Result(ResultCode.SUCCESS, token);
+            return new Result(ResultCode.SUCCESS,token);
         }
     }
 
