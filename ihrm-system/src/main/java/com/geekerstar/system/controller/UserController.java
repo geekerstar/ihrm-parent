@@ -5,16 +5,15 @@ import com.geekerstar.common.entity.PageResult;
 import com.geekerstar.common.entity.Result;
 import com.geekerstar.common.entity.ResultCode;
 
-import com.geekerstar.common.exception.CommonException;
 import com.geekerstar.common.utils.JwtUtils;
+import com.geekerstar.domain.system.Permission;
 import com.geekerstar.domain.system.response.ProfileResult;
 import com.geekerstar.domain.system.User;
 import com.geekerstar.domain.system.response.UserResult;
+import com.geekerstar.system.service.PermissionService;
 import com.geekerstar.system.service.UserService;
-import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +34,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private PermissionService permissionService;
 
     /**
      * 分配角色
@@ -144,28 +146,26 @@ public class UserController extends BaseController {
      * 3.构建返回值对象
      * 4.响应
      */
-    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+    @RequestMapping(value="/profile",method = RequestMethod.POST)
     public Result profile(HttpServletRequest request) throws Exception {
-
-        /**
-         * 从请求头信息中获取token数据
-         *   1.获取请求头信息：名称=Authorization
-         *   2.替换Bearer+空格
-         *   3.解析token
-         *   4.获取clamis
-         */
-        //1.获取请求头信息：名称=Authorization
-        String authorization = request.getHeader("Authorization");
-        if (StringUtils.isEmpty(authorization)) {
-            throw new CommonException(ResultCode.UNAUTHENTICATED);
-        }
-        //2.替换Bearer+空格
-        String token = authorization.replace("Bearer ", "");
-        //3.解析token
-        Claims claims = jwtUtils.parseJwt(token);
         String userid = claims.getId();
+        //获取用户信息
         User user = userService.findById(userid);
-        ProfileResult result = new ProfileResult(user);
-        return new Result(ResultCode.SUCCESS, result);
+        //根据不同的用户级别获取用户权限
+
+        ProfileResult result = null;
+
+        if("user".equals(user.getLevel())) {
+            result = new ProfileResult(user);
+        }else {
+            Map map = new HashMap();
+            if("coAdmin".equals(user.getLevel())) {
+                map.put("enVisible","1");
+            }
+            List<Permission> list = permissionService.findAll(map);
+            result = new ProfileResult(user,list);
+        }
+        return new Result(ResultCode.SUCCESS,result);
     }
 }
+
