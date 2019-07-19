@@ -12,7 +12,6 @@
     <artifactId>ihrm-common-model</artifactId>
 
 
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,7 +1,7 @@
 package com.geekerstar.company;
 
 import com.geekerstar.company.dao.CompanyDao;
-import com.ihrm.domain.company.Company;
+import com.geekerstar.domain.company.Company;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class CompanyDaoTest {
     private CompanyDao companyDao;
 
     @Test
-    public void test(){
+    public void test() {
         Company company = companyDao.findById("1").get();
         System.out.println(company);
 

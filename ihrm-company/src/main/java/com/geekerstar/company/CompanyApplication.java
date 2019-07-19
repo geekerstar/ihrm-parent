@@ -7,16 +7,16 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 
 //1.配置springboot的包扫描
-@SpringBootApplication(scanBasePackages = "com.geekerstar.company")
+@SpringBootApplication(scanBasePackages = "com.geekerstar")
 //2.配置jpa注解的扫描
-@EntityScan(value="com.geekerstar.domain.company")
+@EntityScan(value = "com.geekerstar.domain.company")
 public class CompanyApplication {
 
     /**
      * 启动方法
      */
     public static void main(String[] args) {
-        SpringApplication.run(CompanyApplication.class,args);
+        SpringApplication.run(CompanyApplication.class, args);
     }
 
     @Bean
