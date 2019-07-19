@@ -18,7 +18,7 @@ public class DeptListResult {
     private String companyManage;//公司联系人
     private List<Department> depts;
 
-    public DeptListResult(Company company,List depts) {
+    public DeptListResult(Company company, List depts) {
         this.companyId = company.getId();
         this.companyName = company.getName();
         this.companyManage = company.getLegalRepresentative();//公司联系人

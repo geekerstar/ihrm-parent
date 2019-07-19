@@ -47,8 +47,8 @@ public class Department implements Serializable {
      */
     private String managerId;
     /**
-	*  负责人名称
-	*/
+     * 负责人名称
+     */
     private String manager;
 
     /**

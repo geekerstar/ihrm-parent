@@ -13,7 +13,7 @@ public class BaseController {
     protected String companyName;
 
     @ModelAttribute
-    public void setResAnReq(HttpServletRequest request,HttpServletResponse response) {
+    public void setResAnReq(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
         /**

@@ -34,7 +34,7 @@ public class DepartmentService extends BaseService {
      */
     public void save(Department department) {
         //设置主键的值
-        String id = idWorker.nextId()+"";
+        String id = idWorker.nextId() + "";
         department.setId(id);
         //调用dao保存部门
         departmentDao.save(department);
