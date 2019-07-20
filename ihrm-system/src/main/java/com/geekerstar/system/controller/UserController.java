@@ -13,6 +13,7 @@ import com.geekerstar.domain.system.Role;
 import com.geekerstar.domain.system.response.ProfileResult;
 import com.geekerstar.domain.system.User;
 import com.geekerstar.domain.system.response.UserResult;
+import com.geekerstar.system.client.DepartmentFeignClient;
 import com.geekerstar.system.service.PermissionService;
 import com.geekerstar.system.service.RoleService;
 import com.geekerstar.system.service.UserService;
@@ -49,6 +50,19 @@ public class UserController extends BaseController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private DepartmentFeignClient departmentFeignClient;
+
+    /**
+     * 测试Feign组件
+     * 调用系统微服务的/test接口传递部门id，通过feign调用部门微服务获取部门信息
+     */
+    @RequestMapping(value = "/test/{id}", method = RequestMethod.GET)
+    public Result testFeign(@PathVariable(value = "id") String id) {
+        Result result = departmentFeignClient.findById(id);
+        return result;
+    }
 
     /**
      * 分配角色

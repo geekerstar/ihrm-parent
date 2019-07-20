@@ -12,6 +12,8 @@
         <module>ihrm-common-model</module>
         <module>ihrm-company</module>
         <module>ihrm-system</module>
+        <module>ihrm-employee</module>
+        <module>ihrm-eureka</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -31,6 +33,18 @@
         <java.version>1.8</java.version>
         <fastjson.version>1.2.47</fastjson.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Finchley.SR1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>

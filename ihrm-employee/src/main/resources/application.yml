@@ -1,23 +1,18 @@
-#注册到eureka的服务地址
+#微服务注册到eureka配置
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:6868/eureka/
-#服务配置
 server:
-  port: 9001
-#spring配置
+  port: 9003
 spring:
-  #1.应用配置
   application:
-    name: ihrm-company #指定服务名
-  #2.数据库连接池
+    name: ihrm-employee #指定服务名
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ihrm?useUnicode=true&characterEncoding=utf8
     username: root
     password: 210819
-  #3.JPA
   jpa:
     database: MySQL
     show-sql: true
@@ -25,3 +20,4 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+

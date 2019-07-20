@@ -1,28 +1,30 @@
-package com.geekerstar.company;
+package com.geekerstar.employee;
 
 import com.geekerstar.common.utils.IdWorker;
+import com.geekerstar.common.utils.JwtUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 
-//1.配置springboot的包扫描
-@SpringBootApplication(scanBasePackages = "com.geekerstar")
-//2.配置jpa注解的扫描
-@EntityScan(value = "com.geekerstar.domain.company")
-@EnableEurekaClient
-public class CompanyApplication {
 
-    /**
-     * 启动方法
-     */
+@SpringBootApplication(scanBasePackages = "com.geekerstar")
+@EntityScan("com.geekerstar.domain.employee")
+@EnableEurekaClient
+public class EmployeeApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(CompanyApplication.class, args);
+        SpringApplication.run(EmployeeApplication.class, args);
     }
 
     @Bean
-    public IdWorker idWorker() {
-        return new IdWorker();
+    public IdWorker idWorkker() {
+        return new IdWorker(1, 1);
+    }
+
+    @Bean
+    public JwtUtils jwtUtil() {
+        return new JwtUtils();
     }
 }
