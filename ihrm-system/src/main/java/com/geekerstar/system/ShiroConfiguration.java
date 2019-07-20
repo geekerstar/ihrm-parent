@@ -45,7 +45,6 @@ public class ShiroConfiguration {
 
     /**
      * 再web程序中，shiro进行权限控制全部是通过一组过滤器集合进行控制
-     *
      */
     @Bean
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
@@ -57,13 +56,13 @@ public class ShiroConfiguration {
         filterFactory.setLoginUrl("/autherror?code=1");//跳转url地址
         filterFactory.setUnauthorizedUrl("/autherror?code=2");//未授权的url
         //4.设置过滤器集合
-        Map<String,String> filterMap = new LinkedHashMap<>();
+        Map<String, String> filterMap = new LinkedHashMap<>();
         //anon -- 匿名访问
-        filterMap.put("/sys/login","anon");
-        filterMap.put("/autherror","anon");
+        filterMap.put("/sys/login", "anon");
+        filterMap.put("/autherror", "anon");
         //注册
         //authc -- 认证之后访问（登录）
-        filterMap.put("/**","authc");
+        filterMap.put("/**", "authc");
         //perms -- 具有某中权限 (使用注解配置授权)
         filterFactory.setFilterChainDefinitionMap(filterMap);
 
@@ -120,6 +119,7 @@ public class ShiroConfiguration {
 
     /**
      * 开启对shior注解的支持
+     *
      * @param securityManager
      * @return
      */

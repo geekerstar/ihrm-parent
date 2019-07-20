@@ -26,25 +26,25 @@ public class UserRealm extends IhrmRealm {
         //1.获取用户的手机号和密码
         UsernamePasswordToken upToken = (UsernamePasswordToken) authenticationToken;
         String mobile = upToken.getUsername();
-        String password = new String( upToken.getPassword());
+        String password = new String(upToken.getPassword());
         //2.根据手机号查询用户
         User user = userService.findByMobile(mobile);
         //3.判断用户是否存在，用户密码是否和输入密码一致
-        if(user != null && user.getPassword().equals(password)) {
+        if (user != null && user.getPassword().equals(password)) {
             //4.构造安全数据并返回（安全数据：用户基本数据，权限信息 profileResult）
             ProfileResult result = null;
-            if("user".equals(user.getLevel())) {
+            if ("user".equals(user.getLevel())) {
                 result = new ProfileResult(user);
-            }else {
+            } else {
                 Map map = new HashMap();
-                if("coAdmin".equals(user.getLevel())) {
-                    map.put("enVisible","1");
+                if ("coAdmin".equals(user.getLevel())) {
+                    map.put("enVisible", "1");
                 }
                 List<Permission> list = permissionService.findAll(map);
-                result = new ProfileResult(user,list);
+                result = new ProfileResult(user, list);
             }
             //构造方法：安全数据，密码，realm域名
-            SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(result,user.getPassword(),this.getName());
+            SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(result, user.getPassword(), this.getName());
             return info;
         }
         //返回null，会抛出异常，标识用户名和密码不匹配

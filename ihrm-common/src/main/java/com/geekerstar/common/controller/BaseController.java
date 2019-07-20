@@ -35,11 +35,12 @@ public class BaseController {
 
     /**
      * 使用shiro获取
+     *
      * @param request
      * @param response
      */
     @ModelAttribute
-    public void setResAnReq(HttpServletRequest request,HttpServletResponse response) {
+    public void setResAnReq(HttpServletRequest request, HttpServletResponse response) {
         this.request = request;
         this.response = response;
 
@@ -47,9 +48,9 @@ public class BaseController {
         Subject subject = SecurityUtils.getSubject();
         //1.subject获取所有的安全数据集合
         PrincipalCollection principals = subject.getPrincipals();
-        if(principals != null && !principals.isEmpty()){
+        if (principals != null && !principals.isEmpty()) {
             //2.获取安全数据
-            ProfileResult result = (ProfileResult)principals.getPrimaryPrincipal();
+            ProfileResult result = (ProfileResult) principals.getPrimaryPrincipal();
             this.companyId = result.getCompanyId();
             this.companyName = result.getCompany();
         }
