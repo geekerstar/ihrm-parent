@@ -13,6 +13,7 @@ import com.geekerstar.domain.employee.*;
 import com.geekerstar.domain.employee.response.EmployeeReportResult;
 import com.geekerstar.employee.service.*;
 import io.jsonwebtoken.Claims;
+import net.sf.jasperreports.engine.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -51,6 +52,51 @@ public class EmployeeController extends BaseController {
     @Autowired
     private ArchiveService archiveService;
 
+    /**
+     * 打印员工PDF报表
+     */
+    @RequestMapping(value = "/{id}/pdf",method = RequestMethod.GET)
+    public void pdf(@PathVariable String id) throws IOException {
+        //1、引入jasper文件
+        Resource resource = new ClassPathResource("templates/profile.jasper");
+        FileInputStream fis = new FileInputStream(resource.getFile());
+
+        //2、构造数据
+        //a.用户详情数据
+        UserCompanyPersonal personal = userCompanyPersonalService.findById(id);
+        //b.用户岗位信息数据
+        UserCompanyJobs jobs = userCompanyJobsService.findById(id);
+        //c.用户头像  域名 / id
+        String staffPhoto = "XXXX"+id;
+
+        //3、填充pdf模板数据，并输出pdf
+        Map params = new HashMap();
+        params.put("staffPhoto",staffPhoto);
+
+        Map<String,Object> map1 = BeanMapUtils.beanToMap(personal);
+        Map<String,Object> map2 = BeanMapUtils.beanToMap(jobs);
+        params.putAll(map1);
+        params.putAll(map2);
+
+        ServletOutputStream os = response.getOutputStream();
+        try {
+            /**
+             * fis：jasper文件输入流
+             * new HashMap:向模板中输入的参数
+             * jasperDataSource:数据源（和数据库的数据源不同）
+             *      填充模板的数据来源（connection,javaBean,Map)
+             *      填充空数据来源：JREmptyDataSource
+             */
+            JasperPrint print = JasperFillManager.fillReport(fis,new HashMap<>(),new JREmptyDataSource());
+            //3、将JasperPrint以PDF的形式输出
+            JasperExportManager.exportReportToPdfFile(print,os.toString());
+        } catch (JRException e){
+            e.printStackTrace();
+        } finally {
+            os.flush();
+        }
+
+    }
 
     /**
      * 员工个人信息保存
