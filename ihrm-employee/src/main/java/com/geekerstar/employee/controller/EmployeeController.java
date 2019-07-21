@@ -55,7 +55,7 @@ public class EmployeeController extends BaseController {
     /**
      * 打印员工PDF报表
      */
-    @RequestMapping(value = "/{id}/pdf",method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/pdf", method = RequestMethod.GET)
     public void pdf(@PathVariable String id) throws IOException {
         //1、引入jasper文件
         Resource resource = new ClassPathResource("templates/profile.jasper");
@@ -67,14 +67,14 @@ public class EmployeeController extends BaseController {
         //b.用户岗位信息数据
         UserCompanyJobs jobs = userCompanyJobsService.findById(id);
         //c.用户头像  域名 / id
-        String staffPhoto = "XXXX"+id;
+        String staffPhoto = "XXXX" + id;
 
         //3、填充pdf模板数据，并输出pdf
         Map params = new HashMap();
-        params.put("staffPhoto",staffPhoto);
+        params.put("staffPhoto", staffPhoto);
 
-        Map<String,Object> map1 = BeanMapUtils.beanToMap(personal);
-        Map<String,Object> map2 = BeanMapUtils.beanToMap(jobs);
+        Map<String, Object> map1 = BeanMapUtils.beanToMap(personal);
+        Map<String, Object> map2 = BeanMapUtils.beanToMap(jobs);
         params.putAll(map1);
         params.putAll(map2);
 
@@ -87,10 +87,10 @@ public class EmployeeController extends BaseController {
              *      填充模板的数据来源（connection,javaBean,Map)
              *      填充空数据来源：JREmptyDataSource
              */
-            JasperPrint print = JasperFillManager.fillReport(fis,new HashMap<>(),new JREmptyDataSource());
+            JasperPrint print = JasperFillManager.fillReport(fis, new HashMap<>(), new JREmptyDataSource());
             //3、将JasperPrint以PDF的形式输出
-            JasperExportManager.exportReportToPdfFile(print,os.toString());
-        } catch (JRException e){
+            JasperExportManager.exportReportToPdfFile(print, os.toString());
+        } catch (JRException e) {
             e.printStackTrace();
         } finally {
             os.flush();

@@ -46,7 +46,7 @@ import java.util.Map;
 //2.声明restContoller
 @RestController
 //3.设置父路径
-@RequestMapping(value="/sys")
+@RequestMapping(value = "/sys")
 public class UserController extends BaseController {
 
     @Autowired
@@ -63,20 +63,20 @@ public class UserController extends BaseController {
 
 
     @RequestMapping("/user/upload/{id}")
-    public Result upload(@PathVariable String id,@RequestParam(name="file") MultipartFile file ) throws IOException {
+    public Result upload(@PathVariable String id, @RequestParam(name = "file") MultipartFile file) throws IOException {
         //1.调用service保存图片（获取到图片的访问地址（dataUrl | http地址））
-        String imgUrl = userService.uploadImage(id,file);
+        String imgUrl = userService.uploadImage(id, file);
         //2.返回数据
-        return new Result(ResultCode.SUCCESS,imgUrl);
+        return new Result(ResultCode.SUCCESS, imgUrl);
     }
 
 
     /**
      * 导入Excel，添加用户
-     *  文件上传：springboot
+     * 文件上传：springboot
      */
-    @RequestMapping(value="/user/import",method = RequestMethod.POST)
-    public Result importUser(@RequestParam(name="file") MultipartFile file) throws Exception {
+    @RequestMapping(value = "/user/import", method = RequestMethod.POST)
+    public Result importUser(@RequestParam(name = "file") MultipartFile file) throws Exception {
         //1.解析Excel
 //        //1.1.根据Excel文件创建工作簿
 //        Workbook wb = new XSSFWorkbook(file.getInputStream());
@@ -100,7 +100,7 @@ public class UserController extends BaseController {
 
         List<User> list = new ExcelImportUtil(User.class).readExcel(file.getInputStream(), 1, 1);
         //3.批量保存用户
-        userService.saveAll(list,companyId,companyName);
+        userService.saveAll(list, companyId, companyName);
 
         return new Result(ResultCode.SUCCESS);
     }
@@ -118,10 +118,10 @@ public class UserController extends BaseController {
                 value = cell.getBooleanCellValue();
                 break;
             case NUMERIC:
-                if(DateUtil.isCellDateFormatted(cell)) {
+                if (DateUtil.isCellDateFormatted(cell)) {
                     //日期格式
                     value = cell.getDateCellValue();
-                }else{
+                } else {
                     //数字
                     value = cell.getNumericCellValue();
                 }
@@ -147,19 +147,17 @@ public class UserController extends BaseController {
     }
 
 
-
-
     /**
      * 分配角色
      */
     @RequestMapping(value = "/user/assignRoles", method = RequestMethod.PUT)
-    public Result assignRoles(@RequestBody Map<String,Object> map) {
+    public Result assignRoles(@RequestBody Map<String, Object> map) {
         //1.获取被分配的用户id
         String userId = (String) map.get("id");
         //2.获取到角色的id列表
         List<String> roleIds = (List<String>) map.get("roleIds");
         //3.调用service完成角色分配
-        userService.assignRoles(userId,roleIds);
+        userService.assignRoles(userId, roleIds);
         return new Result(ResultCode.SUCCESS);
     }
 
@@ -184,11 +182,11 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public Result findAll(int page, int size, @RequestParam Map map) {
         //1.获取当前的企业id
-        map.put("companyId",companyId);
+        map.put("companyId", companyId);
         //2.完成查询
-        Page<User> pageUser = userService.findAll(map,page,size);
+        Page<User> pageUser = userService.findAll(map, page, size);
         //3.构造返回结果
-        PageResult pageResult = new PageResult(pageUser.getTotalElements(),pageUser.getContent());
+        PageResult pageResult = new PageResult(pageUser.getTotalElements(), pageUser.getContent());
         return new Result(ResultCode.SUCCESS, pageResult);
     }
 
@@ -219,7 +217,7 @@ public class UserController extends BaseController {
      * 根据id删除
      */
     @RequiresPermissions(value = "API-USER-DELETE")
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE,name = "API-USER-DELETE")
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE, name = "API-USER-DELETE")
     public Result delete(@PathVariable(value = "id") String id) {
         userService.deleteById(id);
         return new Result(ResultCode.SUCCESS);
@@ -230,36 +228,35 @@ public class UserController extends BaseController {
         List<UserSimpleResult> list = new ArrayList<>();
         List<User> users = userService.findAll(companyId);
         for (User user : users) {
-            list.add(new UserSimpleResult(user.getId(),user.getUsername()));
+            list.add(new UserSimpleResult(user.getId(), user.getUsername()));
         }
-        return new Result(ResultCode.SUCCESS,list);
+        return new Result(ResultCode.SUCCESS, list);
     }
 
     /**
      * 用户登录
-     *  1.通过service根据mobile查询用户
-     *  2.比较password
-     *  3.生成jwt信息
-     *
+     * 1.通过service根据mobile查询用户
+     * 2.比较password
+     * 3.生成jwt信息
      */
-    @RequestMapping(value="/login",method = RequestMethod.POST)
-    public Result login(@RequestBody Map<String,String> loginMap) {
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public Result login(@RequestBody Map<String, String> loginMap) {
         String mobile = loginMap.get("mobile");
         String password = loginMap.get("password");
         try {
             //1.构造登录令牌 UsernamePasswordToken
             //加密密码
-            password = new Md5Hash(password,mobile,3).toString();  //1.密码，盐，加密次数
-            UsernamePasswordToken upToken = new UsernamePasswordToken(mobile,password);
+            password = new Md5Hash(password, mobile, 3).toString();  //1.密码，盐，加密次数
+            UsernamePasswordToken upToken = new UsernamePasswordToken(mobile, password);
             //2.获取subject
             Subject subject = SecurityUtils.getSubject();
             //3.调用login方法，进入realm完成认证
             subject.login(upToken);
             //4.获取sessionId
-            String sessionId = (String)subject.getSession().getId();
+            String sessionId = (String) subject.getSession().getId();
             //5.构造返回结果
-            return new Result(ResultCode.SUCCESS,sessionId);
-        }catch (Exception e) {
+            return new Result(ResultCode.SUCCESS, sessionId);
+        } catch (Exception e) {
             return new Result(ResultCode.MOBILEORPASSWORDERROR);
         }
 
@@ -292,19 +289,19 @@ public class UserController extends BaseController {
 
     /**
      * 用户登录成功之后，获取用户信息
-     *      1.获取用户id
-     *      2.根据用户id查询用户
-     *      3.构建返回值对象
-     *      4.响应
+     * 1.获取用户id
+     * 2.根据用户id查询用户
+     * 3.构建返回值对象
+     * 4.响应
      */
-    @RequestMapping(value="/profile",method = RequestMethod.POST)
+    @RequestMapping(value = "/profile", method = RequestMethod.POST)
     public Result profile(HttpServletRequest request) throws Exception {
         //获取session中的安全数据
         Subject subject = SecurityUtils.getSubject();
         //1.subject获取所有的安全数据集合
         PrincipalCollection principals = subject.getPrincipals();
         //2.获取安全数据
-        ProfileResult result = (ProfileResult)principals.getPrimaryPrincipal();
+        ProfileResult result = (ProfileResult) principals.getPrimaryPrincipal();
 
 //        String userid = claims.getId();
 //        //获取用户信息
@@ -323,6 +320,6 @@ public class UserController extends BaseController {
 //            List<Permission> list = permissionService.findAll(map);
 //            result = new ProfileResult(user,list);
 //        }
-        return new Result(ResultCode.SUCCESS,result);
+        return new Result(ResultCode.SUCCESS, result);
     }
 }

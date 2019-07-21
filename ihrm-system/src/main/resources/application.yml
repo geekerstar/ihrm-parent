@@ -1,4 +1,4 @@
-#注册到eureka的服务地址
+#微服务注册到eureka配置
 eureka:
   client:
     service-url:
@@ -29,3 +29,11 @@ jwt:
   config:
     key: saas-ihrm
     ttl: 3600000
+ai:
+  appId: 15191935
+  apiKey: cyWSHgas93Vtdmt42OwbW8pu
+  secretKey: yf1GusMvvLBdOnyubfLubNyod9iEDEZW
+  imageType: BASE64
+  groupId:
+qr:
+  url: http://localhost:8080/#/facelogin

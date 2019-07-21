@@ -25,17 +25,17 @@ public class QiniuUploadUtil {
         manager = new UploadManager(cfg);
     }
 
-	//文件名 = key
-	//文件的byte数组
-    public String upload(String imgName , byte [] bytes) {
+    //文件名 = key
+    //文件的byte数组
+    public String upload(String imgName, byte[] bytes) {
         Auth auth = Auth.create(accessKey, secretKey);
         //构造覆盖上传token
-        String upToken = auth.uploadToken(bucket,imgName);
+        String upToken = auth.uploadToken(bucket, imgName);
         try {
             Response response = manager.put(bytes, imgName, upToken);
             DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
             //返回请求地址
-            return prix+putRet.key+"?t="+new Date().getTime();
+            return prix + putRet.key + "?t=" + new Date().getTime();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
