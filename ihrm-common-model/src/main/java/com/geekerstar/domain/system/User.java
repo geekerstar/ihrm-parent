@@ -1,6 +1,7 @@
 package com.geekerstar.domain.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.geekerstar.domain.poi.ExcelAttribute;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,10 +31,12 @@ public class User implements Serializable {
     /**
      * 手机号码
      */
+    @ExcelAttribute(sort = 2)
     private String mobile;
     /**
      * 用户名称
      */
+    @ExcelAttribute(sort = 1)
     private String username;
     /**
      * 密码
@@ -56,21 +59,25 @@ public class User implements Serializable {
     /**
      * 部门ID
      */
+    @ExcelAttribute(sort = 6)
     private String departmentId;
 
     /**
      * 入职时间
      */
+    @ExcelAttribute(sort = 5)
     private Date timeOfEntry;
 
     /**
      * 聘用形式
      */
+    @ExcelAttribute(sort = 4)
     private Integer formOfEmployment;
 
     /**
      * 工号
      */
+    @ExcelAttribute(sort = 3)
     private String workNumber;
 
     /**
@@ -97,31 +104,33 @@ public class User implements Serializable {
 
     /**
      * level
-     * String
-     * saasAdmin：saas管理员具备所有权限
-     * coAdmin：企业管理（创建租户企业的时候添加）
-     * user：普通用户（需要分配角色）
+     *     String
+     *          saasAdmin：saas管理员具备所有权限
+     *          coAdmin：企业管理（创建租户企业的时候添加）
+     *          user：普通用户（需要分配角色）
      */
     private String level;
 
-    public User(Object[] values) {
+    private String staffPhoto;//用户头像
+
+    public User(Object [] values) {
         //用户名	手机号	工号	聘用 形式	入职 时间	部门编码
         this.username = values[1].toString();
         this.mobile = values[2].toString();
         this.workNumber = new DecimalFormat("#").format(values[3]).toString();
-        this.formOfEmployment = ((Double) values[4]).intValue();
+        this.formOfEmployment =((Double) values[4]).intValue();
         this.timeOfEntry = (Date) values[5];
         this.departmentId = values[6].toString(); //部门编码 != 部门id
     }
 
     /**
-     * JsonIgnore
-     * : 忽略json转化
+     *  JsonIgnore
+     *     : 忽略json转化
      */
     @JsonIgnore
     @ManyToMany
-    @JoinTable(name = "pe_user_role", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
+    @JoinTable(name="pe_user_role",joinColumns={@JoinColumn(name="user_id",referencedColumnName="id")},
+            inverseJoinColumns={@JoinColumn(name="role_id",referencedColumnName="id")}
     )
     private Set<Role> roles = new HashSet<Role>();//用户与角色   多对多
 }
