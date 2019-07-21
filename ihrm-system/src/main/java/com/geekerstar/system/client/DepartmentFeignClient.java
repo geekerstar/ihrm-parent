@@ -18,9 +18,9 @@ public interface DepartmentFeignClient {
     /**
      * 调用微服务的接口
      */
-    @RequestMapping(value="/company/department/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/company/department/{id}", method = RequestMethod.GET)
     public Result findById(@PathVariable(value = "id") String id);
 
-    @RequestMapping(value="/company/department/search",method = RequestMethod.POST)
+    @RequestMapping(value = "/company/department/search", method = RequestMethod.POST)
     public Department findByCode(@RequestParam(value = "code") String code, @RequestParam(value = "companyId") String companyId);
 }

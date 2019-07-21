@@ -2,10 +2,12 @@ package com.geekerstar.domain.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +19,7 @@ import java.util.Set;
 @Table(name = "bs_user")
 @Getter
 @Setter
+@NoArgsConstructor
 public class User implements Serializable {
     private static final long serialVersionUID = 4297464181093070302L;
     /**
@@ -100,6 +103,16 @@ public class User implements Serializable {
      * user：普通用户（需要分配角色）
      */
     private String level;
+
+    public User(Object[] values) {
+        //用户名	手机号	工号	聘用 形式	入职 时间	部门编码
+        this.username = values[1].toString();
+        this.mobile = values[2].toString();
+        this.workNumber = new DecimalFormat("#").format(values[3]).toString();
+        this.formOfEmployment = ((Double) values[4]).intValue();
+        this.timeOfEntry = (Date) values[5];
+        this.departmentId = values[6].toString(); //部门编码 != 部门id
+    }
 
     /**
      * JsonIgnore

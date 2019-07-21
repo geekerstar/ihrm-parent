@@ -1,8 +1,11 @@
 package com.geekerstar.system.service;
 
+import com.geekerstar.common.service.BaseService;
 import com.geekerstar.common.utils.IdWorker;
+import com.geekerstar.domain.company.Department;
 import com.geekerstar.domain.system.Role;
 import com.geekerstar.domain.system.User;
+import com.geekerstar.system.client.DepartmentFeignClient;
 import com.geekerstar.system.dao.RoleDao;
 import com.geekerstar.system.dao.UserDao;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -21,7 +25,7 @@ import java.lang.annotation.Target;
 import java.util.*;
 
 @Service
-public class UserService {
+public class UserService extends BaseService {
 
     @Autowired
     private UserDao userDao;
@@ -38,6 +42,38 @@ public class UserService {
      */
     public User findByMobile(String mobile) {
         return userDao.findByMobile(mobile);
+    }
+
+
+    @Autowired
+    private DepartmentFeignClient departmentFeignClient;
+
+    /**
+     * 批量保存用户
+     */
+    @Transactional
+    public void saveAll(List<User> list, String companyId, String companyName) {
+        for (User user : list) {
+            //默认密码
+            user.setPassword(new Md5Hash("123456", user.getMobile(), 3).toString());
+            //id
+            user.setId(idWorker.nextId() + "");
+            //基本属性
+            user.setCompanyId(companyId);
+            user.setCompanyName(companyName);
+            user.setInServiceStatus(1);
+            user.setEnableState(1);
+            user.setLevel("user");
+
+            //填充部门的属性
+            Department department = departmentFeignClient.findByCode(user.getDepartmentId(), companyId);
+            if (department != null) {
+                user.setDepartmentId(department.getId());
+                user.setDepartmentName(department.getName());
+            }
+
+            userDao.save(user);
+        }
     }
 
     /**
@@ -75,6 +111,10 @@ public class UserService {
      */
     public User findById(String id) {
         return userDao.findById(id).get();
+    }
+
+    public List<User> findAll(String companyId) {
+        return userDao.findAll(super.getSpec(companyId));
     }
 
     /**

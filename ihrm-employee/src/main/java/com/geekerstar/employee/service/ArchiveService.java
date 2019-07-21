@@ -46,16 +46,17 @@ public class ArchiveService extends BaseService {
     }
 
     public Long countAll(String year, String companyId) {
-        return archiveDao.countAllData(companyId, year+"%");
+        return archiveDao.countAllData(companyId, year + "%");
     }
 
 
-    public Page<EmployeeArchive> findSearch(Map<String,Object> map, int page, int size) {
-        return archiveDao.findAll(createSpecification(map), PageRequest.of(page-1, size));
+    public Page<EmployeeArchive> findSearch(Map<String, Object> map, int page, int size) {
+        return archiveDao.findAll(createSpecification(map), PageRequest.of(page - 1, size));
     }
 
     /**
      * 动态条件构建
+     *
      * @param searchMap
      * @return
      */
@@ -65,11 +66,11 @@ public class ArchiveService extends BaseService {
             public Predicate toPredicate(Root<EmployeeArchive> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicateList = new ArrayList<Predicate>();
                 // 企业id
-                if (searchMap.get("companyId")!=null && !"".equals(searchMap.get("companyId"))) {
-                    predicateList.add(cb.like(root.get("companyId").as(String.class), (String)searchMap.get("companyId")));
+                if (searchMap.get("companyId") != null && !"".equals(searchMap.get("companyId"))) {
+                    predicateList.add(cb.like(root.get("companyId").as(String.class), (String) searchMap.get("companyId")));
                 }
-                if (searchMap.get("year")!=null && !"".equals(searchMap.get("year"))) {
-                    predicateList.add(cb.like(root.get("mouth").as(String.class), (String)searchMap.get("year")));
+                if (searchMap.get("year") != null && !"".equals(searchMap.get("year"))) {
+                    predicateList.add(cb.like(root.get("mouth").as(String.class), (String) searchMap.get("year")));
                 }
                 return cb.and(predicateList.toArray(new Predicate[predicateList.size()]));
             }

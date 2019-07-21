@@ -13,11 +13,14 @@ import com.geekerstar.domain.system.Role;
 import com.geekerstar.domain.system.response.ProfileResult;
 import com.geekerstar.domain.system.User;
 import com.geekerstar.domain.system.response.UserResult;
+import com.geekerstar.domain.system.response.UserSimpleResult;
 import com.geekerstar.system.client.DepartmentFeignClient;
 import com.geekerstar.system.service.PermissionService;
 import com.geekerstar.system.service.RoleService;
 import com.geekerstar.system.service.UserService;
 import io.jsonwebtoken.Claims;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -28,8 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +60,70 @@ public class UserController extends BaseController {
     @Autowired
     private DepartmentFeignClient departmentFeignClient;
 
+
+    /**
+     * 导入Excel，添加用户
+     * 文件上传：springboot
+     */
+    @RequestMapping(value = "/user/import", method = RequestMethod.POST)
+    public Result importUser(@RequestParam(name = "file") MultipartFile file) throws Exception {
+        //1.解析Excel
+        //1.1.根据Excel文件创建工作簿
+        Workbook wb = new XSSFWorkbook(file.getInputStream());
+        //1.2.获取Sheet
+        Sheet sheet = wb.getSheetAt(0);//参数：索引
+        //1.3.获取Sheet中的每一行，和每一个单元格
+        //2.获取用户数据列表
+        List<User> list = new ArrayList<>();
+        System.out.println(sheet.getLastRowNum());
+        for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+            Row row = sheet.getRow(rowNum);//根据索引获取每一个行
+            Object[] values = new Object[row.getLastCellNum()];
+            for (int cellNum = 1; cellNum < row.getLastCellNum(); cellNum++) {
+                Cell cell = row.getCell(cellNum);
+                Object value = getCellValue(cell);
+                values[cellNum] = value;
+            }
+            User user = new User(values);
+            list.add(user);
+        }
+        //3.批量保存用户
+        userService.saveAll(list, companyId, companyName);
+
+        return new Result(ResultCode.SUCCESS);
+    }
+
+    public static Object getCellValue(Cell cell) {
+        //1.获取到单元格的属性类型
+        CellType cellType = cell.getCellType();
+        //2.根据单元格数据类型获取数据
+        Object value = null;
+        switch (cellType) {
+            case STRING:
+                value = cell.getStringCellValue();
+                break;
+            case BOOLEAN:
+                value = cell.getBooleanCellValue();
+                break;
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    //日期格式
+                    value = cell.getDateCellValue();
+                } else {
+                    //数字
+                    value = cell.getNumericCellValue();
+                }
+                break;
+            case FORMULA: //公式
+                value = cell.getCellFormula();
+                break;
+            default:
+                break;
+        }
+        return value;
+    }
+
+
     /**
      * 测试Feign组件
      * 调用系统微服务的/test接口传递部门id，通过feign调用部门微服务获取部门信息
@@ -63,6 +133,7 @@ public class UserController extends BaseController {
         Result result = departmentFeignClient.findById(id);
         return result;
     }
+
 
     /**
      * 分配角色
@@ -140,10 +211,14 @@ public class UserController extends BaseController {
         return new Result(ResultCode.SUCCESS);
     }
 
-
-    public static void main(String[] args) {
-        String password = new Md5Hash("123456", "13800000003", 3).toString();
-        System.out.println(password);
+    @RequestMapping(value = "/user/simple", method = RequestMethod.GET)
+    public Result simple() throws Exception {
+        List<UserSimpleResult> list = new ArrayList<>();
+        List<User> users = userService.findAll(companyId);
+        for (User user : users) {
+            list.add(new UserSimpleResult(user.getId(), user.getUsername()));
+        }
+        return new Result(ResultCode.SUCCESS, list);
     }
 
     /**
@@ -173,7 +248,7 @@ public class UserController extends BaseController {
             return new Result(ResultCode.MOBILEORPASSWORDERROR);
         }
 
-//        //JWT方式
+
 //        User user = userService.findByMobile(mobile);
 //        //登录失败
 //        if(user == null || !user.getPassword().equals(password)) {

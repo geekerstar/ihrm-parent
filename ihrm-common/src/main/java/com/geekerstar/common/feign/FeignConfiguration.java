@@ -21,8 +21,8 @@ public class FeignConfiguration {
             //获取所有浏览器发送的请求属性，请求头赋值到feign
             public void apply(RequestTemplate requestTemplate) {
                 //请求属性
-                ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
-                if(attributes != null) {
+                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                if (attributes != null) {
                     HttpServletRequest request = attributes.getRequest();
                     //获取浏览器发起的请求头
                     Enumeration<String> headerNames = request.getHeaderNames();
@@ -30,7 +30,7 @@ public class FeignConfiguration {
                         while (headerNames.hasMoreElements()) {
                             String name = headerNames.nextElement(); //请求头名称 Authorization
                             String value = request.getHeader(name);//请求头数据 "Bearer b1dbb4cf-7de6-41e5-99e2-0e8b7e8fe6ee"
-                            requestTemplate.header(name,value);
+                            requestTemplate.header(name, value);
                         }
                     }
                 }
